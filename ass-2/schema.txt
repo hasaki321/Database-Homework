@@ -1,0 +1,98 @@
+#问题：
+#有些关系根本不需要通过表存储，即可以通过sql语句直接操作
+#包括：add/del(), manage(), create(), edit()
+
+#TODO：
+#添加限制
+#修改ER图（可选）
+#细化表属性（可选）
+#文字解释说明
+
+
+user (  
+	uid : INTEGER(10),
+	email: CHAR(20),
+	password: CHAR(20),
+	avatar_url: CHAR(64),
+	profile: CHAR(256),
+	)
+
+admin ( 
+	uid: INTEGER(10),
+	permission_level: INTEGER(2),
+	)
+
+(user->posts)add/del()
+
+(user->comments)add/del()
+
+posts ( 
+	pid: INTEGER(10),
+	title: CHAR(50),
+	content: CHAR(500),
+	)
+
+classify (
+	cid: INTEGER(10),
+	pid: INTEGER(10),
+	)
+
+subscribe (
+	uid: INTEGER(10),
+	cid: INTEGER(10),
+	)
+
+categories ( 
+	cid: INTEGER(10),
+	cat_name: CHAR(20),
+	cat_desc: CHAR(100),
+	)
+
+mamage ()
+
+(posts->comments) have (
+	pid: INTEGER(10),
+	cid: INTEGER(10),
+	) 
+
+comments (
+	cid: INTEGER(16),
+	content: CHAR(100),
+	datetime: DATETIME,
+	)
+
+join (
+	uid: INTEGER(10),
+	gid: INTEGER(10),
+	)
+
+create ()
+
+groups (
+	gid: INTEGER(10),
+	desc: CHAR(100),
+	)
+
+(groups->announcement)have()
+
+announcement (
+	title: CHAR(50),
+	content: CHAR(200)
+	)
+
+edit ()
+
+advertisement (
+	id: INTEGER(10),
+	content: CHAR(200),
+	)
+
+black_list (
+	from: INTEGER(10),
+	to: INTEGER(10),
+	)
+
+friend_list (
+	friend1: INTEGER(10),
+	friend2: INTEGER(10),
+	)
