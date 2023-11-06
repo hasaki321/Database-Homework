@@ -1,0 +1,19 @@
+we choose personal blog as the theme of homework
+
+a database need to be developed for the storage of the blog content and information
+
+
+1.a visitor could visit any page of the blog website. A visitor could register or login to become a user.User has two subclass:administor and normal user.
+
+2.User is able to add comments in a certain post or upload files including media and documents.And they are allowed to delete the comments add by themselves
+
+3.administor has a attribute of permission level. Administor could manage the website by publishing posts,adding comments or posts categories,delete comment, posts or categoreies according to the permission level
+
+4.Post could only be published,update or delete by administor because it is a personal webpage. And posts should be divided into different categories or no categorie. Beside, a posts may have serval or no comment. Post has attribute like:id,post time,title,content,post cover,cat id.
+
+5.Comment could be add to a certain post by any subclass of user or visitor as an anonymous user and it could be delete by the same user or administor(except visitor). Comment has attribute like: id, datetime, user id, post id, content
+
+6.Post or comment may have file attatched on it. File has two subclass: media and document. Administor is allowed to attatch file on comment or post while normal user is only allowed to attatch file in comment. File owns attribute: datetime,filename,size
+
+7.Categories helps with the classify of post. Categorie could only be add or delete by administor. Categorie owns attribute: id, name
+
