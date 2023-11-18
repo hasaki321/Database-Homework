@@ -1,9 +1,8 @@
 # Database-Homework
 
-## Assignment-2
+## Assignment-3 -- 11/9T1:40
 
-### 2023/11/6 初版
+    本次已完成表创建语句，应该可以直接在postgreSQL中导入sql运行
+    为了方便测试我顺便写了一个一键delete的sql：delete.sql
 
-#### 问题：
-
-要修改的部分以及已修改部分已在文档中标注
+    另外本次问题均已写在problem.txt中
