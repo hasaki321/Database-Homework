@@ -1,0 +1,37 @@
+
+	
+[uid is the foreign key reference to user and uid is not null. 
+uid is cascade]
+
+[Respectively, uid and pid are foreign key reference to user and posts and both are not null.
+(both uid and pid is cascade) ]
+
+[uid is the foreign key reference to user.on deleted no action]
+advertisement (id: INTEGER, content: CHAR, uid: INTEGER)  
+[uid is the foreign key reference to admin. on deleted no action]
+
+manage (uid: INTEGER, cat_id: INTEGER)  
+[uid and cat_id are also foreign key reference to admins and categories respectively. 
+(uid and cat_id is cascade)]
+
+[uid and cat_id are also foreign key reference to users and categories respectively.
+( uid and cat_id is cascade)]
+classify (pid: INTEGER, cat_id: INTEGER)  
+[pid and cat_id are also foreign key reference to posts and categories respectively.
+(pid and cat_id is cascade) ]
+
+
+[uid and gid are foreign key reference to admin and posts respectively. 
+uid and gid is cascade]
+
+[uid and gid are also foreign key reference to users and groups respectively.
+ uid and gid is cascade]
+
+[aid is the partial key of announcements and gid is the primary key of groups. The two key combines the primary key of announcements. gid is not null. 
+on delete cascade]
+
+[Both from and to (reference to the user) comprise the primary key. 
+both is cascade]
+
+[Both uid and other_uid (reference to user) comprise the primary key. 
+both is cascade]

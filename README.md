@@ -1,21 +1,8 @@
 # Database-Homework
 
-## Assignment-2
+## Assignment-3 -- 11/9T1:40
 
-### 2023/11/6 初版
+    本次已完成表创建语句，应该可以直接在postgreSQL中导入sql运行
+    为了方便测试我顺便写了一个一键delete的sql：delete.sql
 
-#### 问题：
-
- 有些关系根本不需要通过表存储，即可以通过 sql 语句直接操作
-
- 包括：add/del(), manage(), create(), edit()
-
-#### TODO：
-
- 添加限制
-
- 修改 ER 图（可选）
-
- 细化表属性（可选）
-
- 文字解释说明
+    另外本次问题均已写在problem.txt中

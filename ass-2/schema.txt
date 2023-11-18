@@ -1,6 +1,6 @@
 #问题：
 #有些关系根本不需要通过表存储，即可以通过sql语句直接操作
-#包括：add/del(), manage(), create(), edit()
+
 
 #TODO：
 #添加限制
@@ -22,9 +22,9 @@ admin (
 	permission_level: INTEGER(2),
 	)
 
-(user->posts)add/del()
 
-(user->comments)add/del()
+
+
 
 posts ( 
 	pid: INTEGER(10),
@@ -48,7 +48,7 @@ categories (
 	cat_desc: CHAR(100),
 	)
 
-mamage ()
+
 
 (posts->comments) have (
 	pid: INTEGER(10),
@@ -66,21 +66,21 @@ join (
 	gid: INTEGER(10),
 	)
 
-create ()
+
 
 groups (
 	gid: INTEGER(10),
 	desc: CHAR(100),
 	)
 
-(groups->announcement)have()
+
 
 announcement (
 	title: CHAR(50),
-	content: CHAR(200)
+
 	)
 
-edit ()
+
 
 advertisement (
 	id: INTEGER(10),
