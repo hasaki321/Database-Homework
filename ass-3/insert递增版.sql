@@ -40,12 +40,12 @@ INSERT INTO comments (content, datetime, uid, pid) VALUES
 ('Comment 10', '2023-01-10 12:15:00', 10, 10);
 
 -- ²åÈë¹ÜÀíÔ±Êý¾Ý
-INSERT INTO admin (permission_level) VALUES
-(1),
-(2),
-(3),
-(1),
-(2);
+INSERT INTO admin (uid,permission_level) VALUES
+(1,1),
+(2,2),
+(3,3),
+(4,1),
+(5,2);
 
 
 INSERT INTO advertisement (content, uid) VALUES
@@ -145,7 +145,7 @@ INSERT INTO join_group (uid, gid) VALUES
 
 
 -- ²åÈë¹«¸æÊý¾Ý
-insert into announcement (aid, gid, title, content) values
+insert into announcement (gid, title, content) values
 (1, 'New Product Launch', 'Content1.'), 
 (2, 'Company Expansion', 'Content2.'), 
 (3, 'Employee Recognition', 'Content3.'), 

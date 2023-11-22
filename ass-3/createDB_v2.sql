@@ -59,7 +59,7 @@ create table advertisement (
 
 create table categories(
     cat_id serial primary key,
-    cat_name char(10) not null,
+    cat_name char(20) not null,
     cat_desc varchar(50)
 );
 
@@ -118,7 +118,7 @@ create table groups(
 
 -- a group could managed by admin
 -- so it have both key reference to admin and group
-create table manage_g(
+create table manage_group(
     uid int,
     gid int,
 
@@ -134,7 +134,7 @@ create table manage_g(
 
 -- a table of group join relation
 -- have foreign key reference to user and group
-create table join_g(
+create table join_group(
     uid int,
     gid int,
 
