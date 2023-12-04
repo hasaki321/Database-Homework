@@ -1,7 +1,16 @@
+/*
+Group S
+Qinru Yang -320220940961
+Rongsen He -320220940271
+Ronghao Li -320220940401
+Rongxuan Wang -320220940781
+*/
+
+
 --To keep user accounts secure, password should not be empty.
 create table users (
     uid int primary key,
-    email char(20),
+    email char(30),
     password char(20) not null,
     profile varchar(100)
 );
@@ -18,9 +27,9 @@ create table admin (
     on delete no action
 );
 
---Posts is written by user and its uid reference to users.
 --Posts and users have a N-to-1 relationship. 
---So if a user be signed out,user's posts will be deleted.
+--Posts is written by user and its uid reference to users. 
+--So if a user be signed out，user's posts will be deleted.
 create table posts (
     pid int primary key,
     title varchar(40) not null,
@@ -33,9 +42,9 @@ create table posts (
     on delete cascade
 );
 
---Comments is written by user and it is owned by a post. So it has uid and pid reference to users and posts.
 --Comments have a N-to-1 relationship with posts and user. 
---So if a user or a post is deleted,correlative comments will be deleted.
+--Comments is written by user and it is owned by a post. So it has uid and pid reference to users and posts.
+--So if a user or a post is deleted，correlative comments will be deleted.
 create table comments (
     cid int primary key,
     content varchar(100) not null,
@@ -51,7 +60,7 @@ create table comments (
 );
 
 --An advertisement is publish by an admin and it has uid reference to admin.
---If a admin is deleted, advertisement should not be deleted, so just need set foreign key null.
+--If an admin is deleted, advertisement should not be deleted, so just need set foreign key null.
 create table advertisement (
     id int primary key,
     content varchar(200) not null,

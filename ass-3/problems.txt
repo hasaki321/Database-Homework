@@ -1,0 +1,8 @@
+error：
+1.表join与留存关键字冲突，此处改成为join_g
+2.表create与留存关键字冲突，此处改为manage_g
+3.black_list中的属性与留存关键字冲突，此处改为与friendlist相同格式
+4.postgreSQL中不存在datetime类型，所有关于此类型的变量均改为timestamp
+
+info：
+1.postgreSQL中不存在auto_incrediment,该类型用serial表示
