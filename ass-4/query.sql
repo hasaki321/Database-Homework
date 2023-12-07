@@ -140,6 +140,9 @@ GROUP BY cat_id
 ORDER BY COUNT(uid) DESC
 LIMIT 1;
 
+
+----------------------------------------------DIVISION---------------------------------------------
+
 --显示用户信息以及发帖数量
 select u.uid, u.email, p.post_count
 from users u
