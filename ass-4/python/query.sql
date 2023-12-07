@@ -1,33 +1,28 @@
-
--- application domain
 -- 向当前帖子下作为某个用户向其中添加评论
 INSERT INTO comments (cid, content, datetime, uid, pid) VALUES
-(20001, 'Comment 1', '2023-01-01 12:15:00', 10008, 1),
--- [Problem]现在有一个问题，如果不设置自增的话自增将要将值记录在服务器中或者另外定义一套cid生成规则来插入
+(20011, 'Comment 1', '2023-01-01 12:15:00', 10008, 1);
 
 -- 查询某个帖子下的所有评论
 select * 
 from comments
-where comments.pid = 1
+where comments.pid = 1;
 
 -- 将某个用户添加进管理员并赋予权限
 INSERT INTO admin (uid, permission_level) VALUES
-(10001, 1)
+(10006, 1);
 
 -- 作为某个用户发布新的帖子并将其归到某个类别下
 INSERT INTO posts (pid, title, content, datetime, uid) VALUES
 (100, 'Title 1', 'Content 1', '2023-01-01 12:00:00', 10006);
--- [Problem]问题同上，需要手动插入pid
 INSERT INTO classify (pid, cat_id) VALUES
-(100, 40001)
+(100, 40001);
 
 -- 查询某个类别下所有的帖子内容
 select * from posts
 where pid in
 (select pid 
 from classify
-where cat_id = 40001)
--- [Fixed] 表classify中没有1这类序号，改为40001之后可正常查询
+where cat_id = 40001);
 
 -- 查询某个用户所有的朋友
 (select other_uid
@@ -36,26 +31,26 @@ where uid = 10001)
 union
 (select uid
 from friend_list 
-where other_uid = 10001)
+where other_uid = 10001);
 
 -- 作为某个用户取消关注某个类别
 delete from subscribe
-where uid = 10006
+where uid = 10006;
 
 -- 作为某个用户加入某个群组
 INSERT INTO join_group (uid, gid) VALUES
-(10001, 50001)
+(10001, 50001);
 
 -- 作为某个用户移除自己发布的帖子
 delete from posts
-where uid = 10001
+where uid = 10001;
 
 -- 作为一名用户将其他用户加入黑名单并将其移出朋友列表如果是朋友
 INSERT INTO black_list (uid, other_uid) VALUES
 (10006, 10007);
 delete from friend_list
 where uid = 10006 and other_uid = 10007
-or uid = 10006 and other_uid = 10007
+or uid = 10006 and other_uid = 10007;
 
 
 
@@ -66,22 +61,21 @@ select b1.uid, b1.other_uid
 from black_list b1, black_list b2
 where b1.other_uid=b2.uid 
 and b2.other_uid = b1.uid 
-and b1.uid < b1.other_uid
+and b1.uid < b1.other_uid;
 
 -- 寻找该帖子的作者的其他帖子
 SELECT p2.pid
 FROM posts p1, posts p2
 WHERE p1.uid = p2.uid
 AND p1.pid = 1
-AND p2.pid != 1
--- [Fixed] 语法错误 在 "pid" 或附近的LINE 5: except pid=1
+AND p2.pid <> 1;
 
 -- 寻找在该贴子下发布评论的用户在该贴子下的其他评论
 select c2.cid 
 from comments c1, comments c2
 where c1.uid = c2.uid
 and c1.pid = 1
-and c2.cid <> c1.cid
+and c2.cid <> c1.cid;
 
 -- 寻找在该群组下同时加入了多个群组的用户
 SELECT j1.uid
@@ -97,7 +91,7 @@ from friend_list f1, friend_list f2
 where
     f1.other_uid = f2.uid
 and
-    f1.uid = 10010
+    f1.uid = 10010;
 
 -- 寻找在同一天发布的所有贴子
 SELECT *
@@ -115,26 +109,25 @@ select uid, count(pid)
 from posts
 where datetime > '2023-01-04 12:00:00'
 group by uid
-having count(pid)>1
+having count(pid)>1;
 
 -- 查询订阅用户数大于1的类别
 select cat_id 
 from subscribe
 group by cat_id
-having count(uid)>1
+having count(uid)>1;
 
 -- 查询用户数量大于1的群组
 select gid 
 from join_group
 group by gid
-having count(uid)>1
+having count(uid)>1;
 
 -- 查询发帖数量大于1的类别
-SELECT cat_id, COUNT(pid) AS post_count
+SELECT cat_id
 FROM classify
 GROUP BY cat_id
 HAVING COUNT(pid) > 1;
--- [Fixed] 错误： 字段 "classify.pid" 必须出现在 GROUP BY 子句中或者在聚合函数中使用LINE 1: select pid 
 
 --找出订阅用户最多的类别
 SELECT cat_id
@@ -166,21 +159,21 @@ select avg(total_amount)
 from 
 (select count(pid) as total_amount
 from posts
-group by uid) as total_table
+group by uid) as total_table;
 
 -- 平均每人发布多少评论
 select avg(total_comments)
 from 
 (select count(cid) as total_comments
 from comments
-group by uid) as total_table
+group by uid) as total_table;
 
 -- 每个帖子平均拥有多少评论
 select avg(total_comments)
 from 
 (select count(cid) as total_comments
 from comments
-group by pid) as total_table
+group by pid) as total_table;
 
 -- 寻找同时加入一个以上群组的用户有多少
 SELECT COUNT(total_users)
@@ -191,7 +184,6 @@ FROM
   GROUP BY uid
   HAVING COUNT(gid) > 1
 ) AS total_users;
--- [Fixed]错误： FROM 中的子查询必须有一个别名 LINE 4: (select gid as total_usr
 
 
 -- 寻找一个群组中平均拥有的告示条目
@@ -199,23 +191,21 @@ select avg(total_ann)
 from 
 (select count(aid) as total_ann
 from announcement
-group by gid) AS group_announcements
--- [Fixed]FROM 中的子查询必须有一个别名 LINE 3: (select count(aid) as total_ann
+group by gid) AS group_announcements;
 
 -- 每个管理员平均发布多少条广告
 select avg(total_adv)
 from 
 (select count(id) as total_adv
 from advertisement
-group by uid) AS admin_adv
--- [Fixed]错误： FROM 中的子查询必须有一个别名 LINE 3: (select count(id) as total_adv
+group by uid) AS admin_adv;
 
 --type4 嵌套否定 -5
 -- 查询非管理员用户发表的帖子
 select * from posts
 where uid 
 not in
-(select uid from admin)
+(select uid from admin);
 
 -- 查询还没有加入群组的用户
 SELECT uid
@@ -224,8 +214,7 @@ WHERE NOT EXISTS (
 SELECT uid
 FROM join_group
 WHERE join_group.uid = users.uid
-)
--- [Fixed]错误： 语法错误 在 "not" 或附近的 LINE 2: not exists
+);
 
 -- 查询还没有添加朋友的用户
 SELECT uid
@@ -237,8 +226,7 @@ FROM friend_list
 UNION
 SELECT DISTINCT other_uid AS uid
 FROM friend_list
-)
--- [Fixed]错误： FROM 中的子查询必须有一个别名 LINE 5: (select distinct uid from friend_list)
+);
 
 --查找不在黑名单且不是管理员的名单
 select uid, email
@@ -265,7 +253,7 @@ WHERE users.uid NOT IN (SELECT uid FROM admin);
 select * from comments
 right join posts 
 on posts.pid = comments.pid
-where posts.pid = 1
+where posts.pid = 1;
 
 -- 寻找某个用户关注的分类下最新发布的5个贴子
 select * from posts p
@@ -275,7 +263,7 @@ right join subscribe s
     on s.cat_id = c.cat_id
 where s.uid = 10006
 order by datetime desc
-limit 5
+limit 5;
 -- [Problem] 加了数据也没有查询到结果，不知道出了啥问题
 
 -- 寻找某用户发布的贴子下最新的3条评论
@@ -284,7 +272,7 @@ right join posts p
     on c.pid = p.pid
 where p.uid = 10006
 order by c.datetime desc
-limit 5
+limit 5;
 
 -- 寻找某类别下的贴子中所有评论中最新的5条
 select * from comments c
@@ -292,7 +280,7 @@ right join classify cl
     on c.pid = cl.pid
 where cl.cat_id = 40001
 order by c.datetime desc
-limit 5
+limit 5;
 
 -- 寻找负责管理某贴子所属类别的所有管理员
 select a.uid from admin a
@@ -300,7 +288,7 @@ right join manage m
     on a.uid = m.uid
 right join classify c
     on m.cat_id = c.cat_id
-where c.pid = 1
+where c.pid = 1;
 
 -- 查询某管理员管理的群组下的发帖数量超过1的所有用户
 select s1.uid from
@@ -312,7 +300,7 @@ where j.uid in
 (select uid from posts
 group by uid
 having count(pid)>1)) as s1
-on s1.gid = s2.gid
+on s1.gid = s2.gid;
 
 --查询某个用户加入了哪些群组
 select groups.gid as group_id, groups.des
