@@ -8,24 +8,36 @@ def get_result(script,conn,query=False):
     cursor = conn.cursor()
     if not query:
         cursor.execute(script)
-        result = cursor.fetchall()
-        print(result)
-    else:
-        for sql in script.split(";"):
-            cursor.execute(sql)
+        try:
             result = cursor.fetchall()
+        except:
+            result = "no output"
+        finally:
             print(result)
+    else:
+        for i,sql in enumerate(script.split(";")[:-1]):
+            try:
+                cursor.execute(sql)
+            except psycopg2.ProgrammingError as e:
+                print(f"error at sql:{i+1}, {e}")
+            try:
+                result = cursor.fetchall()
+            except psycopg2.ProgrammingError as e:
+                print(f"not query type and return nothing:{i+1}, {e}")
+                result = []
+            finally:
+                print(f"successfully excute sql {i+1}") if result and len(result) > 0 else print("false")
     conn.commit()
-    conn.close()
+    
 
 
 if __name__ == "__main__":
 
-    dbname = 'your_database'
-    user = 'your_user'
-    password = 'your_password'
-    host = 'your_host'
-    port = 'your_port'
+    dbname = 'postgres'
+    user = 'postgres'
+    password = 'hrs2004924'
+    host = 'localhost'
+    port = '5432'
     conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
 
     create = "../createDB.sql"
@@ -37,4 +49,5 @@ if __name__ == "__main__":
         script = get_sql(file)
         get_result(script,
                 conn,
-                True if i==len(files) else False)
+                True if i==len(files)-1 else False)
+    conn.close()

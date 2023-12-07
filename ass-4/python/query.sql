@@ -14,7 +14,6 @@ INSERT INTO admin (uid, permission_level) VALUES
 -- 作为某个用户发布新的帖子并将其归到某个类别下
 INSERT INTO posts (pid, title, content, datetime, uid) VALUES
 (100, 'Title 1', 'Content 1', '2023-01-01 12:00:00', 10006);
-
 INSERT INTO classify (pid, cat_id) VALUES
 (100, 40001);
 
@@ -49,7 +48,6 @@ where uid = 10001;
 -- 作为一名用户将其他用户加入黑名单并将其移出朋友列表如果是朋友
 INSERT INTO black_list (uid, other_uid) VALUES
 (10006, 10007);
-
 delete from friend_list
 where uid = 10006 and other_uid = 10007
 or uid = 10006 and other_uid = 10007;
@@ -263,9 +261,10 @@ right join classify c
     on p.pid = c.pid
 right join subscribe s
     on s.cat_id = c.cat_id
-where s.uid = 10010
+where s.uid = 10006
 order by datetime desc
 limit 5;
+-- [Problem] 加了数据也没有查询到结果，不知道出了啥问题
 
 -- 寻找某用户发布的贴子下最新的3条评论
 select * from comments c
