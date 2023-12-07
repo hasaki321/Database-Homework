@@ -1,0 +1,174 @@
+----------------------------------------------DIVISION---------------------------------------------
+
+--显示用户信息以及发帖数量
+select u.uid, u.email, p.post_count
+from users u
+join (select uid, count(pid) as post_count
+      from posts
+      group by uid) p on u.uid = p.uid;
+
+--找出发表文章最多的前3位用户
+SELECT uid, COUNT(pid) AS post_count
+FROM posts
+GROUP BY uid
+ORDER BY post_count DESC
+LIMIT 3;
+
+-- type 3 复合聚合 -6
+-- 已发布帖子用户中每个用户平均发布多少帖子
+select avg(total_amount)
+from 
+(select count(pid) as total_amount
+from posts
+group by uid) as total_table
+
+-- 平均每人发布多少评论
+select avg(total_comments)
+from 
+(select count(cid) as total_comments
+from comments
+group by uid) as total_table
+
+-- 每个帖子平均拥有多少评论
+select avg(total_comments)
+from 
+(select count(cid) as total_comments
+from comments
+group by pid) as total_table
+
+-- 更改后
+-- 寻找同时加入一个以上群组的用户有多少
+select uid, count(gid) as group_count
+from join_group
+group by uid
+having count(gid) > 1;
+
+
+-- 更改后
+-- 寻找每一个群组中评价拥有的告示条目
+select avg(total_ann)
+from (
+    select count(aid) as total_ann
+    from announcement
+    group by gid
+) as group_announcement_counts;
+
+
+-- 更改后
+-- 所有管理员平均发布多少条广告
+select avg(total_adv)
+from (
+    select count(id) as total_adv
+    from advertisement
+    group by uid
+) as user_advertisement_counts;
+
+
+--type4 嵌套否定 -5
+-- 查询非管理员用户发表的帖子
+select * from posts
+where uid 
+not in
+(select uid from admin)
+
+-- 更改后
+-- 查询还没有加入群组的用户
+select uid from users
+where not exists
+(select uid from join_group)
+
+-- 更改后
+-- 查询还没有添加朋友的用户
+select uid from users
+where uid
+not in
+(select distinct uid from friend_list
+union
+select distinct other_uid as uid from friend_list)
+
+--查找不在黑名单且不是管理员的名单
+select uid, email
+from users u
+where not exists (
+    select 1
+    from black_list b
+    where b.uid = u.uid
+) and not exists(
+	select 2
+	from admin a
+	where a.uid = u.uid
+);
+
+-- 改为小写
+-- 列出所有发表过至少一篇文章的非管理员用户
+select distinct users.uid, email, profile
+from users
+join posts on users.uid = posts.uid
+where users.uid not in (select uid from admin);
+
+
+-- type 5 外连接 -8  
+-- 查询pid=1的帖子下的评论
+select * from comments
+right join posts 
+on posts.pid = comments.pid
+where posts.pid = 1
+
+-- 寻找某个用户关注的分类下最新发布的5个贴子
+select * from posts p
+right join classify c
+    on p.pid = c.pid
+right join subscribe s
+    on s.cat_id = c.cat_id
+where s.uid = 10006
+order by datetime desc
+limit 5
+
+-- 寻找某用户发布的贴子下最新的3条评论
+select * from comments c
+right join posts p
+    on c.pid = p.pid
+where p.uid = 10006
+order by c.datetime desc
+limit 5
+
+-- 寻找某类别下的贴子中所有评论中最新的5条
+select * from comments c
+right join classify cl
+    on c.pid = cl.pid
+where cl.cat_id = 40001
+order by c.datetime desc
+limit 5
+
+-- 寻找负责管理某贴子所属类别的所有管理员
+select a.uid from admin a
+right join manage m
+    on a.uid = m.uid
+right join classify c
+    on m.cat_id = c.cat_id
+where c.pid = 1
+
+-- 查询某管理员管理的群组下的发帖数量超过1的所有用户
+select s1.uid from
+(select m.gid from manage_group m
+where m.uid = 10001) as s2
+left join 
+(select j.uid,j.gid from join_group j
+where j.uid in
+(select uid from posts
+group by uid
+having count(pid)>1)) as s1
+on s1.gid = s2.gid
+
+--查询某个用户加入了哪些群组
+select groups.gid as group_id, groups.des
+from groups
+right join join_group on groups.gid = join_group.gid
+where join_group.uid = 10008;
+
+--查找没有评论的文章
+SELECT posts.pid, title
+FROM posts
+LEFT JOIN comments ON posts.pid = comments.pid
+WHERE comments.cid IS NULL;
+
