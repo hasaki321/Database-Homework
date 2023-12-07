@@ -63,7 +63,7 @@ or uid = 10006 and other_uid = 10007
 
 
 
--- type 1
+-- type 1 自连接
 -- 寻找相互拉黑的成对用户
 select b1.uid, b1.other_uid
 from black_list b1, black_list b2
@@ -78,7 +78,9 @@ where p1.uid = p2.uid
 and p1.pid = 1
 except pid=1
 
--- type 2
+-- 
+
+-- type 2 聚合
 -- 查询在指定日期后发表帖子数大于1的用户
 select uid, count(pid)
 from posts
@@ -92,10 +94,19 @@ from subscribe
 group by cat_id
 having count(uid)>1
 
--- [TODO]查询用户数量大于1的群组
--- [TODO]查询发帖数量大于1的类别
+-- 查询用户数量大于1的群组
+select gid 
+from join_group
+group by gid
+having count(uid)>1
 
--- type 3
+-- 查询发帖数量大于1的类别
+select pid 
+from classify
+group by cat_id
+having count(pid)>1
+
+-- type 3 复合聚合
 -- 已发布帖子用户中每个用户平均发布多少帖子
 select avg(total_amount)
 from 
@@ -103,19 +114,55 @@ from
 from posts
 group by uid) as total_table
 
--- [TODO]平均发布多少评论
--- [TODO]每个帖子平均拥有多少评论
+-- 平均每人发布多少评论
+select avg(total_comments)
+from 
+(select count(cid) as total_comments
+from comments
+group by uid) as total_table
 
---type4
+-- 每个帖子平均拥有多少评论
+select avg(total_comments)
+from 
+(select count(cid) as total_comments
+from comments
+group by pid) as total_table
+
+--type4 嵌套否定
 -- 查询非管理员用户发表的帖子
 select * from posts
 where uid 
 not in
 (select uid from admin)
 
---type 5 
+-- 查询还没有加入群组的用户
+select uid from users
+not exists
+(select uid from join_group)
+
+-- 查询还没有添加朋友的用户
+select uid from users
+where uid
+not in
+(select distinct uid from 
+(select distinct uid from friend_list)
+union
+(select distinct other_uid as uid from friend_list))
+
+--type 5 外连接
 -- 查询pid=1的帖子下的评论
 select * from comments
 right join posts 
 on posts.pid = comments.pid
 where posts.pid = 1
+
+-- 寻找某个用户关注的分类下最新发布的5个贴子
+select * from posts p
+right join classify c
+    on p.pid = c.pid
+right join subscribe s
+    on s.cat_id = c.cat_id
+where s.uid = 10006
+order by datetime desc
+limit 5
+
