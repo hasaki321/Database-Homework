@@ -1,8 +1,4 @@
 
-
--- [requirement]请将查询语句中查询/修改/删除的内容更改或者向数据库中增加值以完成正常查询操作
-
-
 -- application domain
 -- 向当前帖子下作为某个用户向其中添加评论
 INSERT INTO comments (cid, content, datetime, uid, pid) VALUES
@@ -63,7 +59,7 @@ or uid = 10006 and other_uid = 10007
 
 
 
--- type 1 自连接
+-- type 1 自连接 -6
 -- 寻找相互拉黑的成对用户
 select b1.uid, b1.other_uid
 from black_list b1, black_list b2
@@ -78,9 +74,40 @@ where p1.uid = p2.uid
 and p1.pid = 1
 except pid=1
 
--- 
+-- 寻找在该贴子下发布评论的用户在该贴子下的其他评论
+select c2.cid 
+from comments c1, comments c2
+where c1.uid = c2.uid
+and c1.pid = 1
+and c2.cid <> c1.cid
 
--- type 2 聚合
+-- 寻找在该群组下同时加入了多个群组的用户
+SELECT j1.uid
+FROM join_group j1
+JOIN join_group j2 ON j1.uid = j2.uid
+WHERE j1.gid = 50001
+GROUP BY j1.uid
+HAVING COUNT(j1.uid) > 1;
+
+-- 寻找某个用户所有朋友的朋友
+select distinct f2.other_uid 
+from friend_list f1, friend_list f2
+where
+    f1.other_uid = f2.uid
+and
+    f1.uid = 10010
+
+-- 寻找在同一天发布的所有贴子
+SELECT *
+FROM
+    posts p1
+JOIN
+    posts p2 ON p1.datetime = p2.datetime
+            AND p1.pid <> p2.pid
+ORDER BY
+    p1.datetime;
+
+-- type 2 聚合 -7
 -- 查询在指定日期后发表帖子数大于1的用户
 select uid, count(pid)
 from posts
@@ -106,7 +133,28 @@ from classify
 group by cat_id
 having count(pid)>1
 
--- type 3 复合聚合
+--找出订阅用户最多的类别
+SELECT cat_id
+FROM subscribe
+GROUP BY cat_id
+ORDER BY COUNT(uid) DESC
+LIMIT 1;
+
+--显示用户信息以及发帖数量
+select u.uid, u.email, p.post_count
+from users u
+join (select uid, count(pid) as post_count
+      from posts
+      group by uid) p on u.uid = p.uid;
+
+--找出发表文章最多的前3位用户
+SELECT uid, COUNT(pid) AS post_count
+FROM posts
+GROUP BY uid
+ORDER BY post_count DESC
+LIMIT 3;
+
+-- type 3 复合聚合 -6
 -- 已发布帖子用户中每个用户平均发布多少帖子
 select avg(total_amount)
 from 
@@ -128,7 +176,32 @@ from
 from comments
 group by pid) as total_table
 
---type4 嵌套否定
+-- 寻找同时加入一个以上群组的用户有多少
+select count(total_usr)
+from 
+(select gid as total_usr
+from join_group
+group by uid
+having count(gid)>1
+)
+
+
+-- 寻找一个群组中评价拥有的告示条目
+select avg(total_ann)
+from 
+(select count(aid) as total_ann
+from announcement
+group by gid)
+
+
+-- 每个管理员平均发布多少条广告
+select avg(total_adv)
+from 
+(select count(id) as total_adv
+from advertisement
+group by uid)
+
+--type4 嵌套否定 -5
 -- 查询非管理员用户发表的帖子
 select * from posts
 where uid 
@@ -149,7 +222,27 @@ not in
 union
 (select distinct other_uid as uid from friend_list))
 
---type 5 外连接
+--查找不在黑名单且不是管理员的名单
+select uid, email
+from users u
+where not exists (
+    select 1
+    from black_list b
+    where b.uid = u.uid
+) and not exists(
+	select 2
+	from admin a
+	where a.uid = u.uid
+);
+
+--列出所有发表过至少一篇文章的非管理员用户
+SELECT DISTINCT users.uid, email, profile
+FROM users
+JOIN posts ON users.uid = posts.uid
+WHERE users.uid NOT IN (SELECT uid FROM admin);
+
+
+--type 5 外连接 -8  
 -- 查询pid=1的帖子下的评论
 select * from comments
 right join posts 
@@ -165,4 +258,52 @@ right join subscribe s
 where s.uid = 10006
 order by datetime desc
 limit 5
+
+-- 寻找某用户发布的贴子下最新的3条评论
+select * from comments c
+right join posts p
+    on c.pid = p.pid
+where p.uid = 10006
+order by c.datetime desc
+limit 5
+
+-- 寻找某类别下的贴子中所有评论中最新的5条
+select * from comments c
+right join classify cl
+    on c.pid = cl.pid
+where cl.cat_id = 40001
+order by c.datetime desc
+limit 5
+
+-- 寻找负责管理某贴子所属类别的所有管理员
+select a.uid from admin a
+right join manage m
+    on a.uid = m.uid
+right join classify c
+    on m.cat_id = c.cat_id
+where c.pid = 1
+
+-- 查询某管理员管理的群组下的发帖数量超过1的所有用户
+select s1.uid from
+(select m.gid from manage_group m
+where m.uid = 10001) as s2
+left join 
+(select j.uid,j.gid from join_group j
+where j.uid in
+(select uid from posts
+group by uid
+having count(pid)>1)) as s1
+on s1.gid = s2.gid
+
+--查询某个用户加入了哪些群组
+select groups.gid as group_id, groups.des
+from groups
+right join join_group on groups.gid = join_group.gid
+where join_group.uid = 10008;
+
+--查找没有评论的文章
+SELECT posts.pid, title
+FROM posts
+LEFT JOIN comments ON posts.pid = comments.pid
+WHERE comments.cid IS NULL;
 
