@@ -59,6 +59,7 @@ or uid = 10006 and other_uid = 10007;
 
 -- type 1 自连接 -6
 -- 寻找相互拉黑的成对用户
+-- revealing reciprocal blocking connections between users in the system.
 select b1.uid, b1.other_uid
 from black_list b1, black_list b2
 where b1.other_uid=b2.uid 
@@ -66,6 +67,7 @@ and b2.other_uid = b1.uid
 and b1.uid < b1.other_uid;
 
 -- 寻找该帖子的作者的其他帖子
+-- providing insights into other posts made by the same user in the system.
 SELECT p2.pid
 FROM posts p1, posts p2
 WHERE p1.uid = p2.uid
@@ -73,6 +75,7 @@ AND p1.pid = 1
 AND p2.pid <> 1;
 
 -- 寻找在该贴子下发布评论的用户在该贴子下的其他评论
+-- providing insights into additional contributions and interactions by the user within the specific post discussion.
 select c2.cid 
 from comments c1, comments c2
 where c1.uid = c2.uid
@@ -80,6 +83,7 @@ and c1.pid = 1
 and c2.cid <> c1.cid;
 
 -- 寻找在该群组下同时加入了多个群组的用户
+-- revealing individuals with diverse group memberships and potential cross-group interactions.
 SELECT j1.uid
 FROM join_group j1
 JOIN join_group j2 ON j1.uid = j2.uid
@@ -88,6 +92,7 @@ GROUP BY j1.uid
 HAVING COUNT(j1.uid) > 1;
 
 -- 寻找某个用户所有朋友的朋友
+-- unveiling potential secondary connections and expanding the social network view.
 select distinct f2.other_uid 
 from friend_list f1, friend_list f2
 where
@@ -96,6 +101,7 @@ and
     f1.uid = 10010;
 
 -- 寻找在同一天发布的所有贴子
+-- The query identifies and retrieves pairs of posts that were published on the same day, providing insights into simultaneous content creation events within the system.
 SELECT *
 FROM
     posts p1
@@ -107,6 +113,7 @@ ORDER BY
 
 -- type 2 聚合 -7
 -- 查询在指定日期后发表帖子数大于1的用户
+-- The query identifies users who have posted more than one post after the specified date, offering insights into consistently active contributors in the system.
 select uid, count(pid)
 from posts
 where datetime > '2023-01-04 12:00:00'
@@ -114,24 +121,28 @@ group by uid
 having count(pid)>1;
 
 -- 查询订阅用户数大于1的类别
+-- highlighting popular or common interest areas among users in the system.
 select cat_id 
 from subscribe
 group by cat_id
 having count(uid)>1;
 
 -- 查询用户数量大于1的群组
+-- revealing communities within the system that consist of multiple users sharing common interests or affiliations.
 select gid 
 from join_group
 group by gid
 having count(uid)>1;
 
 -- 查询发帖数量大于1的类别
+-- indicating active engagement and diverse content within those specific interest areas in the system.
 SELECT cat_id
 FROM classify
 GROUP BY cat_id
 HAVING COUNT(pid) > 1;
 
---找出订阅用户最多的类别
+-- 找出订阅用户最多的类别
+-- revealing the most popular interest area with the largest user base in the system.
 SELECT cat_id
 FROM subscribe
 GROUP BY cat_id
