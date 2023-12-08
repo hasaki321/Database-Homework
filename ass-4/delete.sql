@@ -1,13 +1,13 @@
-drop table comments;
-drop table advertisement;
-drop table manage;
-drop table subscribe;
-drop table classify;
-drop table manage_group;
-drop table join_group;
-drop table announcement;
-drop table black_list;
-drop table friend_list;
+drop table comments CASCADE;
+drop table advertisement CASCADE;
+drop table manage CASCADE;
+drop table subscribe CASCADE;
+drop table classify CASCADE;
+drop table manage_group CASCADE;
+drop table join_group CASCADE;
+drop table announcement CASCADE;
+drop table black_list CASCADE;
+drop table friend_list CASCADE;
 
 drop table categories;
 drop table admin;

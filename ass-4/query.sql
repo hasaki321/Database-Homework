@@ -175,28 +175,34 @@ from posts
 group by uid) as total_table;
 
 -- 平均每人发布多少评论
-select avg(total_comments)
-from 
+create view comments_users as
 (select count(cid) as total_comments
 from comments
-group by uid) as total_table;
+group by uid);
+
+select avg(total_comments)
+from comments_users;
 
 -- 每个帖子平均拥有多少评论
-select avg(total_comments)
-from 
+create view comments_posts as
 (select count(cid) as total_comments
 from comments
-group by pid) as total_table;
+group by pid);
+
+select avg(total_comments)
+from comments_posts;
 
 -- 寻找同时加入一个以上群组的用户有多少
-SELECT COUNT(total_users)
-FROM
+CREATE VIEW total_users_group AS
 (
   SELECT uid
   FROM join_group
   GROUP BY uid
   HAVING COUNT(gid) > 1
-) AS total_users;
+);
+
+SELECT COUNT(total_users_group)
+FROM total_users_group;
 
 
 -- 寻找一个群组中平均拥有的告示条目
@@ -230,16 +236,18 @@ WHERE join_group.uid = users.uid
 );
 
 -- 查询还没有添加朋友的用户
-SELECT uid
-FROM users
-WHERE uid
-NOT IN (
+create view friend_uid as (
 SELECT DISTINCT uid
 FROM friend_list
 UNION
 SELECT DISTINCT other_uid AS uid
 FROM friend_list
 );
+
+SELECT uid
+FROM users
+WHERE uid
+NOT IN (SELECT uid FROM friend_uid);
 
 --查找不在黑名单且不是管理员的名单
 select uid, email
@@ -303,15 +311,19 @@ right join classify c
 where c.pid = 1;
 
 -- 查询某管理员管理的群组下的发帖数量超过1的所有用户
-select s1.uid from
+CREATE VIEW s2 AS
 (select m.gid from manage_group m
-where m.uid = 10001) as s2
-left join 
+where m.uid = 10001);
+
+CREATE VIEW s1 AS
 (select j.uid,j.gid from join_group j
 where j.uid in
 (select uid from posts
 group by uid
-having count(pid)>1)) as s1
+having count(pid)>1));
+
+select s1.uid from
+s1 left join s2
 on s1.gid = s2.gid;
 
 --查询某个用户加入了哪些群组
