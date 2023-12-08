@@ -79,13 +79,13 @@ AND p2.pid <> 1;
 select c2.cid 
 from comments c1, comments c2
 where c1.uid = c2.uid
-and c1.pid = 1
+and c1.cid = 20011
 and c2.cid <> c1.cid;
 
 -- 寻找在该群组下同时加入了多个群组的用户
 -- revealing individuals with diverse group memberships and potential cross-group interactions.
 SELECT j1.uid
-FROM join_group j1
+FROM join_group j1on
 JOIN join_group j2 ON j1.uid = j2.uid
 WHERE j1.gid = 50001
 GROUP BY j1.uid

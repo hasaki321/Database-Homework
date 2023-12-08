@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     create = "../createDB.sql"
     insert = "../insertData.sql"
-    query = "../query.sql"
+    query = "../queries.sql"
     files = [create,insert,query]
 
     for i,file in enumerate(files):
